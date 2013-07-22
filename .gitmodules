@@ -1,0 +1,3 @@
+[submodule "system/expressionengine/third_party/easy_jail/vendors/jail"]
+	path = system/expressionengine/third_party/easy_jail/vendors/jail
+	url = https://github.com/sebarmeli/JAIL.git
