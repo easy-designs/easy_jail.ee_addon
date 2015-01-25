@@ -8,6 +8,9 @@
  This extension was created by Aaron Gustafson
  - aaron@easy-designs.net
  This work is licensed under the MIT License.
+
+ This version modified by Jens Korff, Creative Spirits
+
 =====================================================
  File: pi.easy_jail.php
 -----------------------------------------------------
@@ -81,6 +84,7 @@ class Easy_jail {
 		$lookup = '/(<img([^>]*)\/?>)/';
 		if ( preg_match_all( $lookup, $str, $found, PREG_SET_ORDER ) )
 		{
+
 			# loop the matches
 			foreach ( $found as $instance )
 			{
@@ -94,25 +98,33 @@ class Easy_jail {
 				if ( substr( $instance[2], -1, 1 ) == '/' )
 				{
 					$instance[2] = substr( $instance[2], 0, -1 );
-				} 
+				}
 
-				foreach ( explode( ' ', trim( $instance[2] ) ) as $attr )
-				{
-					preg_match_all( '/([^=]*)=([\'"])(.*)\\2$/', $attr, $matches, PREG_SET_ORDER );
-					
-					if ( isset( $matches[0] ) )
-					{
-						if ( $matches[0][1] == 'src' )
-						{
-							$src = $matches[0][3];
-						}
-						else
-						{
-							$attributes[$matches[0][1]] = $matches[0][1] . '="' . $matches[0][3] . '"';
+				# Get delimiter of "alt" attribute (as this is the critical one [can contain " or ' inside text])
+				preg_match('/alt=([\'"])/', $instance[2], $matches);
+				$delimiter = $matches[1];
+
+				# Get all attributes
+				# Reference: http://stackoverflow.com/questions/138313/how-to-extract-img-src-title-and-alt-from-html-using-php#answer-2937682
+				$doc = new DOMDocument();
+				@$doc->loadHTML($o_img);
+				$tags = $doc->getElementsByTagName('img');
+
+				foreach ($tags as $tag) {
+				#       echo $tag->getAttribute('src');
+
+					foreach ($tag->attributes as $attribute) {
+						$name = $attribute->name;
+						$value = $attribute->value;
+
+						if ( $name == 'src' ) {
+							$src = $value;
+						} else {
+							$attributes[$name] = $name . '=' . $delimiter . $value . $delimiter;
 						}
 					}
 				}
-				
+
 				# enforce an alt attribute
 				if ( ! isset( $attributes['alt'] ) )
 				{
