@@ -1,7 +1,9 @@
 Easy JAIL for ExpressionEngine
 ==============================
 
-ExpressionEngine Plugin to automate use of the jQuery Asynchronous Image Loader
+ExpressionEngine Plugin to automate use of the jQuery Asynchronous Image Loader.
+
+This fork keeps the content of the 'alt' attribute when images are replaced which is important if you want to have WCAG 2.0 compliant code.
 
 The API
 -------
