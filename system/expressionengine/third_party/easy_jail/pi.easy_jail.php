@@ -6,7 +6,8 @@
  http://easy-designs.net/
 =====================================================
  This extension was created by Aaron Gustafson
- - aaron@easy-designs.net
+ (aaron@easy-designs.net) with contributions from
+ Jens Korff
  This work is licensed under the MIT License.
 =====================================================
  File: pi.easy_jail.php
@@ -96,19 +97,24 @@ class Easy_jail {
 					$instance[2] = substr( $instance[2], 0, -1 );
 				} 
 
-				foreach ( explode( ' ', trim( $instance[2] ) ) as $attr )
+				# Get all attributes
+				# Reference: http://stackoverflow.com/questions/138313/how-to-extract-img-src-title-and-alt-from-html-using-php#answer-2937682
+				$doc = new DOMDocument();
+				@$doc->loadHTML($o_img);
+				$tags = $doc->getElementsByTagName('img');
+				
+				foreach ( $tags as $tag )
 				{
-					preg_match_all( '/([^=]*)=([\'"])(.*)\\2$/', $attr, $matches, PREG_SET_ORDER );
-					
-					if ( isset( $matches[0] ) )
+					foreach ( $tag->attributes as $attribute )
 					{
-						if ( $matches[0][1] == 'src' )
+						$name = $attribute->name;
+						$value = $attribute->value;
+				
+						if ( $name == 'src' )
 						{
-							$src = $matches[0][3];
-						}
-						else
-						{
-							$attributes[$matches[0][1]] = $matches[0][1] . '="' . $matches[0][3] . '"';
+							$src = $value;
+						} else {
+							$attributes[$name] = $name . '="' . $value . '"';
 						}
 					}
 				}
@@ -168,7 +174,7 @@ class Easy_jail {
 		$js .= file_get_contents( PATH_THIRD . '/easy_jail/vendors/jail/dist/jail.min.js' ) . "\n\n";
 		
 		# build the trigger
-		$template = '(function($){$("img.{class_name}").jail({jail_config});}(jQuery));';
+		$template = '(function(window,$){$("img.{class_name}").jail({jail_config});$(window).on("load",function(){$(this).resize();});}(this,jQuery));';
 		$swap = array(
 			'class_name'	=> $class_name,
 			'jail_config'	=> $config
