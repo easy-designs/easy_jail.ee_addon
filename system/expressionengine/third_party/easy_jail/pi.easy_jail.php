@@ -113,7 +113,13 @@ class Easy_jail {
 						if ( $name == 'src' )
 						{
 							$src = $value;
-						} else {
+						}
+						elseif ( $name == 'class' )
+						{
+							$class_name .= " {$value}";
+						}
+						else
+						{
 							$attributes[$name] = $name . '="' . $value . '"';
 						}
 					}
